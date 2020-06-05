@@ -97,5 +97,5 @@ EOF
 cat >> pull_request_template.md << EOF
 # Unlicensing your contributions
 - [ ] If this is a ${nontrivial}, I will attach a contributor waiver as explained in
-      [the contributor guidelines](../CONTRIBUTING.md) .
+      [the contributor guidelines](../blob/master/CONTRIBUTING.md) .
 EOF
