@@ -1,6 +1,11 @@
 #!/bin/sh
 
-abspath="$(realpath "$(pwd)")"
+path="${1:-$(pwd)}"
+abspath="$(realpath "${path}")"
+
+[ ! -d "${abspath}" ] && mkdir -p "${abspath}"
+
+cd "${abspath}" || exit
 
 if [ -f ./WAIVER ] || [ -f ./UNLICENSE ]; then
   echo "This project appears to already contain the UNLICENSE or the WAIVER."
@@ -14,10 +19,16 @@ if [ -d ./.git ] &&
 then
   echo ""
 else
-  prj="$(basename "$abspath")" &&
-  echo "Using directory name <${prj}> ${asurl}" &&
-  echo "Note that having the official URL for the project is preferred."
-  echo ""
+  if [ "${GITHUB}" ]; then
+    remote="${GITHUB}/$(basename "$abspath")" &&
+    echo "GITHUB is set, initializing git repo with remote ${remote}" &&
+    git init && git remote add origin "${remote}" || exit
+  else
+    prj="$(basename "$abspath")" &&
+    echo "Using directory name <${prj}> ${asurl}" &&
+    echo "Note that having the official URL for the project is preferred." &&
+    echo "" || exit
+  fi
 fi
 
 cat > WAIVER << EOF
