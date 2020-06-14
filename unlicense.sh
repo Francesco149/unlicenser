@@ -12,24 +12,27 @@ if [ -f ./WAIVER ] || [ -f ./UNLICENSE ]; then
   exit 1
 fi
 
+prj_from_remote() {
+  git remote -v | awk '{ print $2 }' | sed 's/git@//g; s|:|/|g; s/\.git$//g; 1q'
+}
+
 asurl="as url for the WAIVER and CONTRIBUTING.md. edit if needed."
-if [ -d ./.git ] &&
-  prj=$(git remote -v | awk '{ print $2 }' | sed 's/git@//g; s|:|/|g; s/\.git$//g; 1q') &&
+if [ -d ./.git ]; then
+  prj="$(prj_from_remote)" &&
   echo "Found git repo, using first remote <${prj}> ${asurl}"
-then
-  echo ""
 else
   if [ "${GITHUB}" ]; then
     remote="${GITHUB}/$(basename "$abspath")" &&
     echo "GITHUB is set, initializing git repo with remote ${remote}" &&
-    git init && git remote add origin "${remote}" || exit
+    git init && git remote add origin "${remote}" &&
+    prj="$(prj_from_remote)" || exit
   else
     prj="$(basename "$abspath")" &&
     echo "Using directory name <${prj}> ${asurl}" &&
-    echo "Note that having the official URL for the project is preferred." &&
-    echo "" || exit
+    echo "Note that having the official URL for the project is preferred." || exit
   fi
 fi
+echo ""
 
 cat > WAIVER << EOF
 # Copyright waiver for <${prj}>
